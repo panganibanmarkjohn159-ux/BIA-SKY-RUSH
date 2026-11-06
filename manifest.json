@@ -1,8 +1,8 @@
 
 {
+  "id": "./",
   "name": "BIA SKY RUSH",
   "short_name": "BIA SKY",
-  "id": "./",
   "description": "A funny and addictive BIA airplane flying game.",
   "start_url": "./",
   "scope": "./",
@@ -13,7 +13,7 @@
   "icons": [
     {
       "src": "icon.svg",
-      "sizes": "any",
+      "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any"
     }
