@@ -1,0 +1,13 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="100" fill="#80d9ff"/>
+  <circle cx="410" cy="95" r="45" fill="#ffdf42"/>
+  <path d="M75 260 Q75 220 125 220 L390 220 Q435 220 435 260 Q435 300 390 300 L125 300 Q75 300 75 260Z" fill="white"/>
+  <path d="M175 225 L235 105 L290 225Z" fill="#1769aa"/>
+  <path d="M180 290 L240 390 L290 290Z" fill="#1769aa"/>
+  <path d="M80 235 L40 175 L135 220Z" fill="#e63946"/>
+  <circle cx="355" cy="245" r="22" fill="#1769aa"/>
+  <circle cx="361" cy="240" r="8" fill="white"/>
+  <path d="M365 275 Q385 295 405 270" fill="none" stroke="#1769aa" stroke-width="9" stroke-linecap="round"/>
+  <text x="220" y="270" font-size="43" font-weight="bold" fill="#1769aa">BIA</text>
+</svg>
