@@ -1,0 +1,20 @@
+
+{
+  "name": "BIA SKY RUSH",
+  "short_name": "BIA SKY",
+  "description": "A funny and addictive BIA airplane flying game.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#80d9ff",
+  "theme_color": "#1769aa",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
