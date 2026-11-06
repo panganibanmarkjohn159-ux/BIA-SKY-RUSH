@@ -1,0 +1,255 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIA SKY RUSH</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#101c36;color:white;
+ font-family:Arial,sans-serif;text-align:center;
+ overflow:hidden;touch-action:manipulation
+}
+h1{margin:12px 0 4px;color:#ffe45c}
+#game{
+ display:block;margin:10px auto;
+ width:min(94vw,420px);height:min(70vh,620px);
+ border:4px solid white;border-radius:14px;
+ background:#80d9ff;touch-action:none
+}
+p{margin:6px}
+button{
+ padding:13px 28px;border:0;border-radius:25px;
+ background:#ffdf42;color:#18233c;
+ font-size:18px;font-weight:bold
+}
+</style>
+</head>
+<body>
+<h1>✈️ BIA SKY RUSH</h1>
+<p>Tap to fly! Avoid the obstacles!</p>
+<canvas id="game" width="420" height="620"></canvas>
+<p id="score">SCORE: 0 | BEST: 0</p>
+<button id="start">START GAME</button>
+
+<script>
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+const scoreText=document.getElementById("score");
+const startBtn=document.getElementById("start");
+
+let plane, obstacles, score, best, playing, started;
+let frame=0;
+
+best=Number(localStorage.getItem("biaBest")||0);
+
+function reset(){
+ plane={x:105,y:300,vy:0};
+ obstacles=[];
+ score=0;
+ frame=0;
+ playing=true;
+ started=true;
+ startBtn.textContent="RESTART";
+}
+
+function flap(){
+ if(!started || !playing) reset();
+ plane.vy=-6.2;
+}
+
+startBtn.addEventListener("click",()=>{
+ reset();
+});
+
+canvas.addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ flap();
+});
+
+document.addEventListener("keydown",e=>{
+ if(e.code==="Space"){
+ e.preventDefault();
+ flap();
+ }
+});
+
+function drawPlane(x,y){
+ ctx.save();
+ ctx.translate(x,y);
+
+ // Wings
+ ctx.fillStyle="#1769aa";
+ ctx.beginPath();
+ ctx.moveTo(-20,0);
+ ctx.lineTo(-5,-24);
+ ctx.lineTo(30,-13);
+ ctx.lineTo(28,5);
+ ctx.fill();
+
+ // Body
+ ctx.fillStyle="white";
+ ctx.beginPath();
+ ctx.ellipse(0,0,34,17,0,0,Math.PI*2);
+ ctx.fill();
+
+ // Tail
+ ctx.fillStyle="#e63946";
+ ctx.beginPath();
+ ctx.moveTo(-27,-4);
+ ctx.lineTo(-38,-23);
+ ctx.lineTo(-13,-13);
+ ctx.fill();
+
+ // BIA label
+ ctx.fillStyle="#1260a4";
+ ctx.font="bold 14px Arial";
+ ctx.fillText("BIA",-15,5);
+
+ // Funny eye
+ ctx.fillStyle="white";
+ ctx.beginPath();
+ ctx.arc(19,-8,8,0,Math.PI*2);
+ ctx.fill();
+ ctx.fillStyle="#111";
+ ctx.beginPath();
+ ctx.arc(21,-8,3.5,0,Math.PI*2);
+ ctx.fill();
+
+ // Smile
+ ctx.strokeStyle="#111";
+ ctx.lineWidth=2;
+ ctx.beginPath();
+ ctx.arc(24,3,6,0.2,1.8);
+ ctx.stroke();
+
+ ctx.restore();
+}
+
+function drawBackground(){
+ ctx.fillStyle="#80d9ff";
+ ctx.fillRect(0,0,420,620);
+
+ // Sun
+ ctx.fillStyle="#ffdf42";
+ ctx.beginPath();
+ ctx.arc(350,85,35,0,Math.PI*2);
+ ctx.fill();
+
+ // Clouds
+ ctx.fillStyle="white";
+ for(let i=0;i<4;i++){
+ let x=(i*140-frame*.35)%500;
+ if(x< -60)x+=500;
+ let y=120+(i%2)*120;
+ ctx.beginPath();
+ ctx.arc(x,y,22,0,Math.PI*2);
+ ctx.arc(x+25,y-10,28,0,Math.PI*2);
+ ctx.arc(x+50,y,22,0,Math.PI*2);
+ ctx.fill();
+ }
+
+ // Ground
+ ctx.fillStyle="#69bd55";
+ ctx.fillRect(0,570,420,50);
+}
+
+function drawObstacle(o){
+ ctx.fillStyle="#247a48";
+ ctx.fillRect(o.x,0,55,o.top);
+ ctx.fillRect(o.x,o.top+o.gap,55,570-(o.top+o.gap));
+
+ ctx.fillStyle="#36a65c";
+ ctx.fillRect(o.x-5,o.top-15,65,15);
+ ctx.fillRect(o.x-5,o.top+o.gap,65,15);
+}
+
+function gameOver(){
+ playing=false;
+ startBtn.textContent="PLAY AGAIN";
+}
+
+function update(){
+ if(!playing)return;
+
+ frame++;
+ plane.vy+=0.28;
+ plane.y+=plane.vy;
+
+ if(frame%105===0){
+ let top=90+Math.random()*210;
+ obstacles.push({x:440,top:top,gap:175});
+ }
+
+ obstacles.forEach(o=>{
+ o.x-=2.8+score*.025;
+
+ if(!o.passed && o.x+55<plane.x){
+ o.passed=true;
+ score++;
+ }
+
+ if(plane.x+25>o.x && plane.x-25<o.x+55){
+ if(plane.y-12<o.top || plane.y+12>o.top+o.gap){
+ gameOver();
+ }
+ }
+ });
+
+ obstacles=obstacles.filter(o=>o.x>-70);
+
+ if(plane.y>558 || plane.y<0)gameOver();
+
+ if(score>best){
+ best=score;
+ localStorage.setItem("biaBest",best);
+ }
+
+ scoreText.textContent="SCORE: "+score+" | BEST: "+best;
+}
+
+function draw(){
+ drawBackground();
+ obstacles.forEach(drawObstacle);
+
+ if(plane)drawPlane(plane.x,plane.y);
+
+ if(!started){
+ ctx.fillStyle="#14243c";
+ ctx.font="bold 27px Arial";
+ ctx.fillText("READY TO FLY?",85,280);
+ ctx.font="18px Arial";
+ ctx.fillText("Tap START to begin!",110,320);
+ }
+
+ if(!playing && started){
+ ctx.fillStyle="rgba(0,0,0,.55)";
+ ctx.fillRect(0,0,420,620);
+ ctx.fillStyle="white";
+ ctx.font="bold 36px Arial";
+ ctx.fillText("GAME OVER",90,275);
+ ctx.font="22px Arial";
+ ctx.fillText("SCORE: "+score,155,320);
+ ctx.font="17px Arial";
+ ctx.fillText("Tap PLAY AGAIN!",130,360);
+ }
+}
+
+function loop(){
+ update();
+ draw();
+ requestAnimationFrame(loop);
+}
+
+started=false;
+playing=false;
+plane={x:105,y:300,vy:0};
+obstacles=[];
+score=0;
+scoreText.textContent="SCORE: 0 | BEST: "+best;
+loop();
+</script>
+</body>
+</html>
